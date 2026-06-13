@@ -16,7 +16,7 @@ A modern FAQ Management Platform built with React, TypeScript, Tailwind CSS, Rea
 ```bash
 cd clickfaq
 npm install
-cp .env.example .env   # Add your Google Translate API key
+cp .env.example .env   # Add the Translate API key here
 npm run dev
 ```
 
@@ -25,8 +25,8 @@ Open [http://localhost:5173](http://localhost:5173) — any email/password works
 ##  Translation API
 
 1. Enable the [Cloud Translation API](https://console.cloud.google.com/apis/library/translate.googleapis.com)
-2. Create an API key in Google Cloud Console
-3. Set `VITE_GOOGLE_TRANSLATE_API_KEY` in `.env`
+2. Create an API key 
+3. Set `TRANSLATE_API_KEY` in `.env`
 
 Without an API key, the app falls back to English content.
 

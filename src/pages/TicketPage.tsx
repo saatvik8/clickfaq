@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   Ticket,
@@ -13,6 +13,7 @@ import {
 import { Navbar } from '../components/layout/Navbar';
 import { StarRating } from '../components/ui/StarRating';
 import { submitTicket, submitFeedback, getTickets, updateTicketStatus } from '../services/tickets';
+import { logActivity } from '../services/engagement';
 import type { Ticket as TicketType } from '../types';
 
 const TICKET_CATEGORIES = [
@@ -81,11 +82,14 @@ export default function TicketPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'in-progress' | 'resolved'>('all');
   const [priorityFilter, setPriorityFilter] = useState<'all' | 'low' | 'medium' | 'high' | 'urgent'>('all');
 
+
+
   const handleTicketSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setTicketLoading(true);
     const ticket = submitTicket(ticketForm);
     setTicketId(ticket.id);
+    logActivity('search', `Raised Ticket ${ticket.id} under category: ${ticket.category}`);
     setTickets(getTickets());
     setTicketLoading(false);
   };
@@ -110,6 +114,7 @@ export default function TicketPage() {
 
   const handleUpdateStatus = (id: string, status: 'open' | 'in-progress' | 'resolved') => {
     updateTicketStatus(id, status);
+    logActivity('ticket_update', `Support ticket ${id} marked as ${status}`);
     setTickets(getTickets());
   };
 

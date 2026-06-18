@@ -92,3 +92,32 @@ export const HEATMAP_COLORS: Record<HeatmapLevel, string> = {
   orange: '#f97316',
   red: '#ef4444',
 };
+
+export interface ActivityLogEntry {
+  id: string;
+  type: string;
+  details: string;
+  timestamp: string;
+}
+
+const ACTIVITY_LOG_KEY = 'activity_log';
+
+export function logActivity(type: string, details: string): void {
+  try {
+    const logs = getItem<ActivityLogEntry[]>(ACTIVITY_LOG_KEY, []);
+    const newEntry: ActivityLogEntry = {
+      id: `act-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      type,
+      details,
+      timestamp: new Date().toISOString(),
+    };
+    const updated = [newEntry, ...logs].slice(0, 20);
+    setItem(ACTIVITY_LOG_KEY, updated);
+  } catch (e) {
+    console.error('Failed to log activity:', e);
+  }
+}
+
+export function getActivityLog(): ActivityLogEntry[] {
+  return getItem<ActivityLogEntry[]>(ACTIVITY_LOG_KEY, []);
+}

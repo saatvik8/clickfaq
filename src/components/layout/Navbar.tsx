@@ -7,6 +7,7 @@ import {
   LogOut,
   MessageSquarePlus,
   Loader2,
+  BookOpen,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage, LANGUAGES } from '../../contexts/LanguageContext';
@@ -14,6 +15,7 @@ import type { SupportedLanguage } from '../../types';
 
 const NAV_ITEMS = [
   { path: '/faq', label: 'FAQ', icon: HelpCircle },
+  { path: '/rosetta', label: 'Rosetta Journal', icon: BookOpen },
   { path: '/ticket', label: 'Raise Ticket', icon: MessageSquarePlus },
 ];
 

@@ -5,6 +5,7 @@ import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import FAQPage from './pages/FAQPage';
 import TicketPage from './pages/TicketPage';
+import RosettaPage from './pages/RosettaPage';
 
 export default function App() {
   return (
@@ -18,6 +19,14 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <FAQPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/rosetta"
+              element={
+                <ProtectedRoute>
+                  <RosettaPage />
                 </ProtectedRoute>
               }
             />

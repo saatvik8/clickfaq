@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, X, ChevronDown, ChevronUp, Star, BarChart3 } from 'lucide-react';
 import { Navbar } from '../components/layout/Navbar';
@@ -9,7 +9,7 @@ import { HeatmapLegend } from '../components/faq/HeatmapLegend';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useFAQTranslation } from '../hooks/useFAQTranslation';
-import { computeHeatmapLevels } from '../services/engagement';
+import { computeHeatmapLevels, logActivity } from '../services/engagement';
 import { getBookmarks } from '../services/bookmarks';
 import { AnalyticsDashboard } from '../components/faq/AnalyticsDashboard';
 import faqData from '../data/faqs.json';
@@ -27,6 +27,22 @@ export default function FAQPage() {
   const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
 
   const allFaqs = data.faqs as FAQ[];
+
+  // Debounced search logging
+  useEffect(() => {
+    if (!search.trim() || search.length < 3) return;
+    const timer = setTimeout(() => {
+      logActivity('search', `Searched keywords: "${search}"`);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // Translate logging
+  useEffect(() => {
+    if (language !== 'en') {
+      logActivity('translate', `Switched language to: ${language.toUpperCase()}`);
+    }
+  }, [language]);
 
   const filteredFaqs = useMemo(() => {
     let result = allFaqs;
@@ -58,8 +74,15 @@ export default function FAQPage() {
   const toggleExpand = (id: string) => {
     setExpandedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+        const faq = allFaqs.find((f) => f.id === id);
+        if (faq) {
+          logActivity('expand', `Read FAQ ${faq.number}: "${faq.question.substring(0, 45)}..."`);
+        }
+      }
       return next;
     });
   };
@@ -193,7 +216,18 @@ export default function FAQPage() {
                 heatmapLevel={heatmapLevels[faq.id] ?? 'green'}
                 isExpanded={expandedIds.has(faq.id)}
                 onToggle={() => toggleExpand(faq.id)}
-                onBookmarkToggle={() => setBookmarks(getBookmarks())}
+                onBookmarkToggle={() => {
+                  const currentBookmarks = getBookmarks();
+                  const added = currentBookmarks.length > bookmarks.length;
+                  const faqItem = allFaqs.find((f) => f.id === faq.id);
+                  if (faqItem) {
+                    logActivity(
+                      added ? 'bookmark_add' : 'bookmark_remove',
+                      `${added ? 'Bookmarked' : 'Unbookmarked'} FAQ ${faqItem.number}: "${faqItem.question.substring(0, 35)}..."`
+                    );
+                  }
+                  setBookmarks(currentBookmarks);
+                }}
               />
             );
           })}
@@ -223,6 +257,7 @@ export default function FAQPage() {
         onClose={() => setIsAnalyticsOpen(false)}
         faqs={allFaqs}
         categories={data.categories}
+        onSearchSelect={(word) => setSearch(word)}
       />
     </div>
   );

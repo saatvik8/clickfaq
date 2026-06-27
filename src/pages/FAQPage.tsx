@@ -62,12 +62,16 @@ export default function FAQPage() {
     }
     if (search.trim()) {
       const q = search.toLowerCase();
-      result = result.filter(
-        (f) =>
+      result = result.filter((f) => {
+        const tr = translatedFAQ(f);
+        return (
           f.question.toLowerCase().includes(q) ||
           f.answer.toLowerCase().includes(q) ||
-          f.categoryName.toLowerCase().includes(q)
-      );
+          f.categoryName.toLowerCase().includes(q) ||
+          tr.question.toLowerCase().includes(q) ||
+          tr.answer.toLowerCase().includes(q)
+        );
+      });
     }
     return result;
   }, [allFaqs, selectedCategory, search, showBookmarksOnly, bookmarks]);
